@@ -1,0 +1,75 @@
+final REPOSITORY_URL = 'https://github.com/GinVavilon/gradle-android-eclipse'
+
+final GROUP_ID = 'com.github.ginvavilon'
+final ARTIFACT_ID = 'gralde-android-eclipse'
+final VERSION = '0.8.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.+'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'nexus'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:+'
+}
+
+configurations {
+    mavenDeployer
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.groupId = GROUP_ID
+        pom.artifactId = ARTIFACT_ID
+        pom.version = VERSION
+    }
+}
+
+modifyPom {
+    project {
+        name 'Android Eclipse'
+        description 'Plugin for generation files of eclipse in android project'
+        url REPOSITORY_URL
+        inceptionYear '2016'
+
+        scm {
+            url REPOSITORY_URL
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'ginVavilon'
+                name 'Vladimir Baraznovsky'
+                email 'ginVavilon@gmail.com'
+            }
+        }
+    }
+}

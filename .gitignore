@@ -1,0 +1,11 @@
+.gradle
+local.properties
+.idea
+.DS_Store
+build/
+bin/
+gradle.properties
+/gradle-app.setting
+/.project
+/.classpath
+/.settings/
