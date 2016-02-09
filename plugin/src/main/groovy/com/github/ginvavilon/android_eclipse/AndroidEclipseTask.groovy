@@ -33,36 +33,36 @@ class AndroidEclipseTask extends DefaultTask {
 
     public EclipseModel eclipse
     public ApplicationVariant variant
- 
+
 
     @TaskAction
     void run() {
-        
+
         updateProjectProperties()
-        
-        
+
+
         def configurations = project.configurations
-       
+
 
         def buildDir=project.buildDir;
-        
+
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
         def manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
         def resFile=new File("$buildDir/intermediates/res/merged/$pathVariant/AndroidManifest.xml");
         def rFile=new File("$buildDir/generated/source/r/$pathVariant");
-        
+
         eclipseProject.linkedResource(name: 'AndroidManifest.xml', type: '1', location: manifestFile.absolutePath);
         eclipseProject.linkedResource(name: 'gen', type: '2', location: rFile.absolutePath);
 
 
-        
+
         final def eclipseClasspathSourceSets = eclipse.classpath.sourceSets
         def libs=new HashSet()
         def configLibs=new HashSet()
         variant.sourceSets.each { sourceSet ->
             final def name=sourceSet.name.toString()
-            
+
             SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(PREFIX_SOURCESETS+name);
             if (mainSourceSet==null){
                 mainSourceSet = eclipseClasspathSourceSets.create(PREFIX_SOURCESETS+name);
@@ -78,44 +78,47 @@ class AndroidEclipseTask extends DefaultTask {
                     configLibs+=conf.files;
                 }
             }
-            
+
         }
-        
+
             variant.compileLibraries.each{file ->
-               
+
                     libs.add(file)
 
             }
-        
-        
+
+
         libs-=configLibs;
         libs-= configurations.compile.files
         libs-= configurations.androidEclipse.files
         project.dependencies{
-           
+
             libsFromVariant configurations.compile
             libsFromVariant configurations.androidEclipse
             libsFromVariant project.files(libs)
         }
-        
 
-        
-        
+
+
+
         eclipse.classpath.plusConfigurations.add(configurations.libsFromVariant)
-        
+
         def generatedSourceSets = eclipseClasspathSourceSets.create(SOURCES_GENERATED)
-        
+
         AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
         ext.generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
         }
-     
-        
+
+
     }
 
     private updateProjectProperties() {
         Properties props = new Properties()
         File propsFile = new File(project.projectDir,'project.properties')
+        if (!propsFile.exists()){
+        	propsFile.createNewFile()
+        }
         props.load(propsFile.newDataInputStream())
         props.setProperty('target', project.android.compileSdkVersion)
 
