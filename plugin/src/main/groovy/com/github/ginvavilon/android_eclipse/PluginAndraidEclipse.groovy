@@ -20,14 +20,14 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         project.configurations {libsFromVariant}
         updateEclipse(project.eclipse)
         def buildDir=project.buildDir;
-                
+
         AndroidEclipseExtension extension = new AndroidEclipseExtension();
         extension.generatedDirs+=[
-         "$buildDir/generated/source/buildConfig", 
-         "$buildDir/generated/source/aidl", 
+         "$buildDir/generated/source/buildConfig",
+         "$buildDir/generated/source/aidl",
          "$buildDir/generated/source/rs"]
-        
-      
+
+
         project.extensions.add("androidEclipse", extension)
 
         project.android {
@@ -50,9 +50,9 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         }
     }
 
-    private updateEclipse(EclipseModel eclipse) 
+    private updateEclipse(EclipseModel eclipse)
     {
-        
+
         updateEclipseProject(eclipse.project)
         updateEclipseClasspath(eclipse.classpath)
 
@@ -65,7 +65,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
                 }
             }
         }
-        
+
     }
 
 
@@ -82,10 +82,9 @@ public class PluginAndraidEclipse implements Plugin<Project> {
 
     private updateEclipseProject(EclipseProject project) {
         project.natures.clear()
-        project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
         project.natures 'org.eclipse.buildship.core.gradleprojectnature'
         project.natures 'com.android.ide.eclipse.adt.AndroidNature'
         project.natures 'org.eclipse.jdt.core.javanature'
-    
+
     }
 }
