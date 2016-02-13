@@ -37,7 +37,8 @@ public class PluginAndraidEclipse implements Plugin<Project> {
                 def task=project.task("eclipse$vname",
                 type: AndroidEclipseTask ,
                 group : 'IDE',
-                description : "Generates all Eclipse files $androidVariant.description "
+                description : "Generates all Eclipse files $androidVariant.description ",
+                dependsOn : androidVariant.javaCompiler.dependsOn
                 )
 
                 task.finalizedBy 'eclipse'
