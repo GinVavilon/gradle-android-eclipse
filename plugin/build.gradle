@@ -1,7 +1,7 @@
 final REPOSITORY_URL = 'https://github.com/GinVavilon/gradle-android-eclipse'
 
 final GROUP_ID = 'com.github.ginvavilon'
-final ARTIFACT_ID = 'gralde-android-eclipse'
+final ARTIFACT_ID = 'android-eclipse'
 final VERSION = '0.8.0'
 
 buildscript {
@@ -47,8 +47,8 @@ uploadArchives {
 
 modifyPom {
     project {
-        name 'Android Eclipse'
-        description 'Plugin for generation files of eclipse in android project'
+        name 'Android-Eclipse'
+        description 'Plugin for generation files for eclipse in android project'
         url REPOSITORY_URL
         inceptionYear '2016'
 
