@@ -3,7 +3,7 @@ final VCS_URL = 'https://github.com/GinVavilon/gradle-android-eclipse.git'
 
 final GROUP_ID = 'com.github.ginvavilon'
 final ARTIFACT_ID = 'android-eclipse'
-final VERSION = '0.8.0'
+final VERSION = '0.8.1'
 
 final DESCRIPTION = 'Plugin for generation files for eclipse in android project'
 final NAME = 'Android-Eclipse'
@@ -16,8 +16,35 @@ buildscript {
     dependencies {
         classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'org.eclipse.jgit:org.eclipse.jgit:4.2.0.+'
     }
 }
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+
+def getGitTag(){
+    
+    try{
+    	FileRepositoryBuilder builder = new FileRepositoryBuilder();
+    	Repository repository = builder.findGitDir(projectDir)
+      		.readEnvironment()
+      		.build();
+     	Git git=Git.wrap(repository)
+     	RevWalk walk = new RevWalk(repository);
+     	def tagName = git.describe().call()
+     	def tag = walk.parseTag(repository.getTags().get(tagName).objectId)
+    	return tag
+    } catch (e){
+        return null
+    }
+}
+
+def gitTag = getGitTag();
+
+
+
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
@@ -111,8 +138,9 @@ bintray {
             publicDownloadNumbers = true
             version {
                     name = VERSION
-                    //desc = 'Version description'
-                    //vcsTag = 'Tagname'
+                    desc = gitTag?.fullMessage
+                    vcsTag = gitTag?.tagName
+                    released = gitTag?.taggerIdent?.when?.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
                     attributes = ['gradle-plugin': 'android-eclipse']
             }
     }
