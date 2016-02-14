@@ -120,6 +120,32 @@ publishing {
                     version VERSION
                     artifact sourcesJar 
                     artifact javadocJar
+                    pom.withXml {
+                	asNode().children().last() + {
+                    	resolveStrategy = Closure.DELEGATE_FIRST
+                        name NAME
+        				description DESCRIPTION
+        				url REPOSITORY_URL
+                    	scm {
+                        	 url REPOSITORY_URL
+                    	}
+                    	licenses {
+                        	license {
+                        	    name 'The Apache Software License, Version 2.0'
+                            	url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            	distribution 'repo'
+                        	}
+                    	}
+                    	developers {
+                        	 developer {
+             				 	id 'ginVavilon'
+                			 	name 'Vladimir Baraznovsky'
+                				email 'ginVavilon@gmail.com'
+                        	}
+                    	}
+                	}
+            	}
+                    
             }
     }
 }
