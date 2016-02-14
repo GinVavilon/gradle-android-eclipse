@@ -136,6 +136,7 @@ bintray {
             vcsUrl = VCS_URL
             labels = ['android', 'eclipse', 'gradle']
             publicDownloadNumbers = true
+            publish = true
             version {
                     name = VERSION
                     desc = gitTag?.fullMessage
