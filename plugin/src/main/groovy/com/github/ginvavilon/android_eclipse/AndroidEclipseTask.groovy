@@ -32,13 +32,13 @@ class AndroidEclipseTask extends DefaultTask {
 '# Project target.';
 
     public EclipseModel eclipse
-    public ApplicationVariant variant
+    public def variant
 
 
     @TaskAction
     void run() {
         updateProjectProperties()
-        
+
 
         def configurations = project.configurations
 
@@ -79,15 +79,14 @@ class AndroidEclipseTask extends DefaultTask {
             }
 
         }
-
+        if(variant.hasProperty('compileLibraries')){
             variant.compileLibraries.each{file ->
                 if (file.exists()){
                     libs.add(file)
                 }
 
             }
-
-
+        }
         libs-=configLibs;
         libs-= configurations.compile.files
         libs-= configurations.androidEclipse.files
