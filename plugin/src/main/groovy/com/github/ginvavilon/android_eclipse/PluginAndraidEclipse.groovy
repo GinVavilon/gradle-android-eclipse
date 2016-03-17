@@ -14,7 +14,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
     void apply(final Project project) {
 
         mProject=project
-        project.apply(plugin: 'android')
+        //project.apply(plugin: 'android')
         project.apply(plugin: 'eclipse')
         project.configurations {androidEclipse}
         project.configurations {libsFromVariant}
@@ -30,8 +30,18 @@ public class PluginAndraidEclipse implements Plugin<Project> {
 
         project.extensions.add("androidEclipse", extension)
 
-        project.android {
-            applicationVariants.all { androidVariant ->
+        def variants;
+
+        if(project.android.hasProperty("applicationVariants")){
+              variants = project.android.applicationVariants;
+        } else if(project.android.hasProperty("libraryVariants")){
+              variants = project.android.libraryVariants;
+        } else{
+            throw new RuntimeException("Problem with android plugin");
+        }
+
+
+        variants.all { androidVariant ->
 
                 def vname="$androidVariant.name".capitalize()
                 def task=project.task("eclipse$vname",
@@ -47,8 +57,8 @@ public class PluginAndraidEclipse implements Plugin<Project> {
                     variant = androidVariant
                     eclipse = project.eclipse
                 }
-            }
         }
+
     }
 
     private updateEclipse(EclipseModel eclipse)
