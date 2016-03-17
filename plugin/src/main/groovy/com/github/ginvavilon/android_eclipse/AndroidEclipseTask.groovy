@@ -38,7 +38,7 @@ class AndroidEclipseTask extends DefaultTask {
     @TaskAction
     void run() {
         updateProjectProperties()
-
+        AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
 
         def configurations = project.configurations
 
@@ -47,11 +47,21 @@ class AndroidEclipseTask extends DefaultTask {
 
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
-        def manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+        //def manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+        def manifestFile
+        if (ext.manifest == null){
+            manifestFile = null
+        } else if (ext.manifest == AndroidEclipseExtension.GENERATED){
+            manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+        } else {
+            manifestFile = project.file(ext.manifest)
+        }
+
         def resFile=new File("$buildDir/intermediates/res/merged/$pathVariant/AndroidManifest.xml");
         def rFile=new File("$buildDir/generated/source/r/$pathVariant");
-
-        eclipseProject.linkedResource(name: 'AndroidManifest.xml', type: '1', location: manifestFile.absolutePath);
+        if (manifestFile!=null){
+            eclipseProject.linkedResource(name: 'AndroidManifest.xml', type: '1', location: manifestFile.absolutePath);
+        }
         eclipseProject.linkedResource(name: 'gen', type: '2', location: rFile.absolutePath);
 
 
@@ -115,7 +125,7 @@ class AndroidEclipseTask extends DefaultTask {
 
         def generatedSourceSets = eclipseClasspathSourceSets.create(SOURCES_GENERATED)
 
-        AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
+
         ext.generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
         }
