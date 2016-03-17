@@ -14,7 +14,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
     void apply(final Project project) {
 
         mProject=project
-        project.apply(plugin: 'android')
+        //project.apply(plugin: 'android')
         project.apply(plugin: 'eclipse')
         project.configurations {androidEclipse}
         project.configurations {libsFromVariant}
