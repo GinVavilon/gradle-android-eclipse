@@ -12,6 +12,8 @@ import com.android.build.gradle.api.ApplicationVariant
 
 class AndroidEclipseTask extends DefaultTask {
 
+    static final String MANIFEST = 'AndroidManifest.xml'
+
     static final String SOURCES_GENERATED = 'generated'
 
     static final String PREFIX_SOURCESETS = 'android_'
@@ -55,12 +57,16 @@ class AndroidEclipseTask extends DefaultTask {
             manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
         } else {
             manifestFile = project.file(ext.manifest)
+            if (manifestFile.directory){
+                manifestFile= new File(manifestFile,MANIFEST)
+            }
+
         }
 
         def resFile=new File("$buildDir/intermediates/res/merged/$pathVariant/AndroidManifest.xml");
         def rFile=new File("$buildDir/generated/source/r/$pathVariant");
         if (manifestFile!=null){
-            eclipseProject.linkedResource(name: 'AndroidManifest.xml', type: '1', location: manifestFile.absolutePath);
+            eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
         }
         eclipseProject.linkedResource(name: 'gen', type: '2', location: rFile.absolutePath);
 

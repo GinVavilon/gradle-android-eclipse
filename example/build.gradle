@@ -46,7 +46,7 @@ sourceSets {
     }
 }
 androidEclipse{
-    manifest = null
+    manifest = merged
     generatedDirs-="$buildDir/generated/source/rs"
 }
 

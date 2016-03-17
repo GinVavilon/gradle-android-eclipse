@@ -11,8 +11,10 @@ class AndroidEclipseExtension {
 
      public static final int GENERATED = 1
      public static final int BUILD = GENERATED
+     public static final int MERGED = GENERATED
+     public static final int merged = MERGED
      public static final int generated = GENERATED
-     public static final int build = GENERATED
+     public static final int build = BUILD
 
      def generatedDirs = new HashSet()
      def manifest = MAIN
