@@ -79,6 +79,17 @@ class AndroidEclipseTask extends DefaultTask {
             }
 
         }
+
+
+         if(variant.hasProperty('javaCompile')){
+            variant.javaCompile.classpath.each{file ->
+                if (file.exists()){
+                    libs.add(file)
+                }
+
+            }
+        }
+
         if(variant.hasProperty('compileLibraries')){
             variant.compileLibraries.each{file ->
                 if (file.exists()){
