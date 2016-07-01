@@ -18,4 +18,9 @@ class AndroidEclipseExtension {
 
      def generatedDirs = new HashSet()
      def manifest = MAIN
+     def resLink = DISABLED
+
+     public static String res(String flavor){
+        return "src/$flavor/res"
+     }
 }
