@@ -29,6 +29,10 @@ eclipse {
     }
 }
 
+androidEclipse{
+   resLink = merged
+}
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
