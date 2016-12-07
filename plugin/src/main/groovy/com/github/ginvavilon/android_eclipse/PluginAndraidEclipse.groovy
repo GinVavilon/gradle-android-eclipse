@@ -44,19 +44,28 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         variants.all { androidVariant ->
 
                 def vname="$androidVariant.name".capitalize()
-                def task=project.task("eclipse$vname",
+
+                def eclipseTask=project.task("eclipse$vname",
                 type: AndroidEclipseTask ,
                 group : 'IDE',
-                description : "Generates all Eclipse files $androidVariant.description ",
-                dependsOn : androidVariant.javaCompiler.dependsOn
+                description : "Generates all Eclipse files $androidVariant.description "
+
                 )
 
-                task.finalizedBy 'eclipse'
+                eclipseTask.finalizedBy 'eclipse'
 
-                task.doFirst {
+                eclipseTask.doFirst {
                     variant = androidVariant
                     eclipse = project.eclipse
                 }
+
+                def fullTask=project.task("eclipseAndroid$vname",
+                group : 'IDE',
+                description : "Clear and generates all eclipse files $androidVariant.description ",
+                dependsOn : [project.cleanEclipse, androidVariant.javaCompiler.dependsOn]
+                )
+
+                fullTask.finalizedBy eclipseTask
         }
 
     }
