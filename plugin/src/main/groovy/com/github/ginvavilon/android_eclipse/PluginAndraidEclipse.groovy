@@ -57,6 +57,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
                 eclipseTask.doFirst {
                     variant = androidVariant
                     eclipse = project.eclipse
+                    androidPlugin = project.android
                 }
 
                 def fullTask=project.task("eclipseAndroid$vname",

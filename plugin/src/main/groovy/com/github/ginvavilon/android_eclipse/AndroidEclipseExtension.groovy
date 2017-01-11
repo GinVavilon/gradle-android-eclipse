@@ -23,4 +23,8 @@ class AndroidEclipseExtension {
      public static String res(String flavor){
         return "src/$flavor/res"
      }
+
+     public static String generated(String type){
+        return "%buildDir%/intermediates/manifests/$type/%pathVariant%/AndroidManifest.xml"
+     }
 }

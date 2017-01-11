@@ -36,6 +36,7 @@ class AndroidEclipseTask extends DefaultTask {
 
     public EclipseModel eclipse
     public def variant
+    public def androidPlugin
 
 
     @TaskAction
@@ -44,7 +45,7 @@ class AndroidEclipseTask extends DefaultTask {
         AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
 
         def configurations = project.configurations
-
+        def library = androidPlugin in com.android.build.gradle.LibraryExtension;
 
         def buildDir=project.buildDir;
 
@@ -55,9 +56,16 @@ class AndroidEclipseTask extends DefaultTask {
         if (ext.manifest == null){
             manifestFile = null
         } else if (ext.manifest == AndroidEclipseExtension.GENERATED){
-            manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+            if (library){
+                manifestFile=new File("$buildDir/intermediates/manifests/aapt/$pathVariant/AndroidManifest.xml");
+            } else {
+                manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+            }
         } else {
-            manifestFile = project.file(ext.manifest)
+            manifestFile = project.file(ext.manifest
+                        .replaceAll('%buildDir%',"$buildDir")
+                        .replaceAll('%pathVariant%',"$pathVariant")
+                        )
             if (manifestFile.directory){
                 manifestFile= new File(manifestFile,MANIFEST)
             }
