@@ -22,6 +22,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         def buildDir=project.buildDir;
 
         AndroidEclipseExtension extension = new AndroidEclipseExtension();
+        extension.eclipse = project.eclipse;
         extension.generatedDirs+=[
          "$buildDir/generated/source/buildConfig",
          "$buildDir/generated/source/aidl",
