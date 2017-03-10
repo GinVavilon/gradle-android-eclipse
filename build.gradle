@@ -3,8 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:+'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:+'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 
