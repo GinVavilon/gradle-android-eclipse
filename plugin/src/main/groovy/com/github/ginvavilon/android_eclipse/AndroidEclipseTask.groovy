@@ -16,6 +16,7 @@ class AndroidEclipseTask extends DefaultTask {
     static final String RES = 'res'
 
     static final String SOURCES_GENERATED = 'generated'
+    static final String SOURCES_LINKED = 'linked'
 
     static final String PREFIX_SOURCESETS = 'android_'
 
@@ -93,17 +94,27 @@ class AndroidEclipseTask extends DefaultTask {
 
 
         final def eclipseClasspathSourceSets = eclipse.classpath.sourceSets
+        def linkedSourceSets = eclipseClasspathSourceSets.create(SOURCES_LINKED)
         def libs=new HashSet()
         def configLibs=new HashSet()
+        def linkedSources=new HashSet()
+        
         variant.sourceSets.each { sourceSet ->
             final def name=sourceSet.name.toString()
-
             SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(PREFIX_SOURCESETS+name);
             if (mainSourceSet==null){
                 mainSourceSet = eclipseClasspathSourceSets.create(PREFIX_SOURCESETS+name);
             }
             sourceSet.javaDirectories.each { dir->
-                 mainSourceSet.getJava().srcDir(dir);
+                boolean areRelated = dir.absolutePath.startsWith(project.rootDir.absolutePath);
+                if (areRelated){
+                    mainSourceSet.getJava().srcDir(dir);
+                } else {
+                    def path = "src-$name"
+                    eclipseProject.linkedResource(name: path, type: '2', location: dir.absolutePath);
+                    linkedSources += path;
+
+                }
 
             }
             def conf=configurations.findByName(name+'Compile');
@@ -134,7 +145,7 @@ class AndroidEclipseTask extends DefaultTask {
 
             }
         }
-        libs-=configLibs;
+        libs-= configLibs;
         libs-= configurations.compile.files
         libs-= configurations.androidEclipse.files
         project.dependencies{
@@ -144,9 +155,6 @@ class AndroidEclipseTask extends DefaultTask {
             libsFromVariant project.files(libs)
         }
 
-
-
-
         eclipse.classpath.plusConfigurations.add(configurations.libsFromVariant)
 
         def generatedSourceSets = eclipseClasspathSourceSets.create(SOURCES_GENERATED)
@@ -155,7 +163,18 @@ class AndroidEclipseTask extends DefaultTask {
         ext.generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
         }
-
+        
+        eclipse.classpath {
+            file {
+                withXml {
+                    def node = it.asNode()
+                    for (link in linkedSources) {
+                        node.appendNode('classpathentry', [kind: 'src', path: link, exported: true])
+                    }
+                }
+        }
+    }
+        
 
     }
 
