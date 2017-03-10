@@ -47,8 +47,9 @@ sourceSets {
 }
 androidEclipse{
     manifest = merged
-    generatedDirs-="$buildDir/generated/source/rs"
-    resLink=res("flavor1")
+    generatedDirs -= "$buildDir/generated/source/rs"
+    resLink = res("flavor1")
+    pluginType = ANDMORE
 }
 
 dependencies {

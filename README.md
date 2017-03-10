@@ -90,6 +90,13 @@ androidEclipse{
 
     //Directories for generated source
     generatedDirs-="$buildDir/generated/source/rs"
+    
+    // Link to res folder    
+    resLink = res("flavor1")
+    //resLink = merged
+    
+    // Plugin for android ADT, ANDMORE or name (like 'com.android.ide.eclipse.adt')
+    pluginType = ANDMORE
 }
 
 dependencies {
