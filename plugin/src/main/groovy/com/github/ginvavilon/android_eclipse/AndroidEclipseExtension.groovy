@@ -42,8 +42,8 @@ class AndroidEclipseExtension {
      
      public void setPluginType(String type){
         clearAndroidPlugin();
-        eclipse.project.natures+= "${type}.AndroidNature";
-        eclipse.classpath.containers.add("${type}.ANDROID_FRAMEWORK");
+        eclipse.project.natures+= String.valueOf("${type}.AndroidNature");
+        eclipse.classpath.containers.add(String.valueOf("${type}.ANDROID_FRAMEWORK"));
          
      }
      
