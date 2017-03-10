@@ -110,10 +110,11 @@ class AndroidEclipseTask extends DefaultTask {
                 if (areRelated){
                     mainSourceSet.getJava().srcDir(dir);
                 } else {
-                    def path = "src-$name"
-                    eclipseProject.linkedResource(name: path, type: '2', location: dir.absolutePath);
-                    linkedSources += path;
-
+                    if (dir.exists()){
+                        def path = "src-$name"
+                        eclipseProject.linkedResource(name: path, type: '2', location: dir.absolutePath);
+                        linkedSources += path;
+                    }
                 }
 
             }
