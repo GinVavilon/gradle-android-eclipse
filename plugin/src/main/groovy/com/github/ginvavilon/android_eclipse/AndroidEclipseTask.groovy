@@ -98,6 +98,7 @@ class AndroidEclipseTask extends DefaultTask {
         def libs=new HashSet()
         def configLibs=new HashSet()
         def linkedSources=new HashSet()
+        def projectAbsolutePath = project.file('.').absolutePath
         
         variant.sourceSets.each { sourceSet ->
             final def name=sourceSet.name.toString()
@@ -106,7 +107,7 @@ class AndroidEclipseTask extends DefaultTask {
                 mainSourceSet = eclipseClasspathSourceSets.create(PREFIX_SOURCESETS+name);
             }
             sourceSet.javaDirectories.each { dir->
-                boolean areRelated = dir.absolutePath.startsWith(project.rootDir.absolutePath);
+                boolean areRelated = dir.absolutePath.startsWith(projectAbsolutePath);
                 if (areRelated){
                     mainSourceSet.getJava().srcDir(dir);
                 } else {
