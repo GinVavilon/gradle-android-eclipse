@@ -30,7 +30,7 @@ class AndroidEclipseExtension {
      def manifest = MAIN
      def resLink = DISABLED
      def eclipse = null;
-   
+     def classpathJarProjects = new HashSet()
 
      public static String res(String flavor){
         return "src/$flavor/res"
