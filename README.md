@@ -97,6 +97,9 @@ androidEclipse{
     
     // Plugin for android ADT, ANDMORE or name (like 'com.android.ide.eclipse.adt')
     pluginType = ANDMORE
+    
+    // List projects with jar in classpath (duplication of project classpath as jar classpath)
+    classpathJarProjects += project(':exampleLibrary')
 }
 
 dependencies {

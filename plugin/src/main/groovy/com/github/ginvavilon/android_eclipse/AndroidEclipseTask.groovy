@@ -5,6 +5,7 @@ import java.util.HashSet
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 
 import com.android.build.gradle.api.ApplicationVariant
@@ -150,6 +151,21 @@ class AndroidEclipseTask extends DefaultTask {
         libs-= configLibs;
         libs-= configurations.compile.files
         libs-= configurations.androidEclipse.files
+
+        configurations.compile.dependencies.each { dependency -> 
+            
+            if (dependency instanceof ProjectDependency){
+                def libProject = dependency.dependencyProject
+                if (!ext.classpathJarProjects.contains(libProject)){ 
+                    def dir=libProject.buildDir.absolutePath;
+                    libs.removeAll {
+                        project.file(it).absolutePath.startsWith(dir)
+                    }
+                }
+
+            }
+        }
+        
         project.dependencies{
 
             libsFromVariant configurations.compile
