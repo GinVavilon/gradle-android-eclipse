@@ -39,7 +39,7 @@ class AndroidEclipseTask extends DefaultTask {
     public EclipseModel eclipse
     public def variant
     public def androidPlugin
-
+    
 
     @TaskAction
     void run() {
@@ -152,20 +152,8 @@ class AndroidEclipseTask extends DefaultTask {
         libs-= configurations.compile.files
         libs-= configurations.androidEclipse.files
 
-        configurations.compile.dependencies.each { dependency -> 
-            
-            if (dependency instanceof ProjectDependency){
-                def libProject = dependency.dependencyProject
-                if (!ext.classpathJarProjects.contains(libProject)){ 
-                    def dir=libProject.buildDir.absolutePath;
-                    libs.removeAll {
-                        project.file(it).absolutePath.startsWith(dir)
-                    }
-                }
-
-            }
-        }
-        
+        clearProject(libs,variant,variant.productFlavors,0,"")
+                        
         project.dependencies{
 
             libsFromVariant configurations.compile
@@ -192,8 +180,51 @@ class AndroidEclipseTask extends DefaultTask {
                 }
         }
     }
-        
 
+    }
+    
+    private clearProject(def libs,def variant, def flavors, def current , def prefix ){
+        if (current<flavors.size()){
+            def flavor=flavors.get(current)
+            def name = flavor.name
+            clearProject(libs,variant,flavors,current+1, appendCapitalizeSuffix(prefix, flavor.name))
+            clearProject(libs,variant,flavors,current+1, prefix)
+        } else { 
+            def typeName= appendCapitalizeSuffix(prefix, variant.buildType.name) 
+            clearProject(libs, prefix)
+            clearProject(libs, typeName)
+        }
+    }
+    
+    private clearProject(def libs, String name){ 
+       def compileName = appendCapitalizeSuffix(name, "compile")
+       AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
+       try{ 
+            project.configurations[compileName]?.dependencies?.each { dependency -> 
+                if (dependency instanceof ProjectDependency){
+                    def libProject = dependency.dependencyProject
+                
+                    if (!ext.classpathJarProjects.contains(libProject)){ 
+                        def dir=libProject.buildDir.absolutePath;
+                        libs.removeAll {
+                            project.file(it).absolutePath.startsWith(dir)
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+        }
+        
+    }
+    
+    
+    private appendCapitalizeSuffix(def prefix, def suffix){
+        if (prefix.empty){
+            return prefix+suffix
+        } else {
+            return prefix + suffix.capitalize() 
+        }
     }
 
     private updateProjectProperties() {
