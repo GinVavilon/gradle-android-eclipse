@@ -26,6 +26,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         extension.generatedDirs+=[
          "$buildDir/generated/source/buildConfig",
          "$buildDir/generated/source/aidl",
+         "$buildDir/generated/source/apt",
          "$buildDir/generated/source/rs"]
 
 
