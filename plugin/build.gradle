@@ -3,7 +3,7 @@ final VCS_URL = 'https://github.com/GinVavilon/gradle-android-eclipse.git'
 
 final GROUP_ID = 'com.github.ginvavilon'
 final ARTIFACT_ID = 'android-eclipse'
-final VERSION = '0.9.0'
+final VERSION = '0.9.1'
 
 final DESCRIPTION = 'Plugin for generation files for eclipse in android project'
 final NAME = 'Android-Eclipse'
@@ -51,6 +51,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'nexus'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'eclipse'
 
 repositories {
     mavenCentral()
@@ -86,7 +87,7 @@ modifyPom {
         name NAME
         description DESCRIPTION
         url REPOSITORY_URL
-        inceptionYear '2016'
+        inceptionYear '2017'
 
         scm {
             url REPOSITORY_URL
@@ -125,7 +126,7 @@ publishing {
                     	resolveStrategy = Closure.DELEGATE_FIRST
                         name NAME
         				description DESCRIPTION
-        				inceptionYear '2016'
+        				inceptionYear '2017'
         				url REPOSITORY_URL
                     	scm {
                         	 url REPOSITORY_URL
