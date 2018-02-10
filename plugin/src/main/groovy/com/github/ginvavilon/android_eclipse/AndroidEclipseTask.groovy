@@ -121,11 +121,14 @@ class AndroidEclipseTask extends DefaultTask {
 
             }
             def conf=configurations.findByName(name+'Compile');
-            if (conf!=null){
-                project.dependencies{
-                    libsFromVariant conf
-                    configLibs+=conf.files;
+            try{ 
+                if (conf!=null){
+                    project.dependencies{
+                        libsFromVariant conf
+                        configLibs+=conf.files;
+                    }
                 }
+            } catch (Exception e){
             }
 
         }
