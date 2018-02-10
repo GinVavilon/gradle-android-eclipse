@@ -1,3 +1,5 @@
+ [ ![Download](https://api.bintray.com/packages/ginvavilon/maven/Android-Eclipse/images/download.svg?version=0.9.3) ](https://bintray.com/ginvavilon/maven/Android-Eclipse/0.9.3/link)
+ 
 This is a plugin for Android Project.
 
 ## Adding plugin
