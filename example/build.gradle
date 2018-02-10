@@ -55,7 +55,7 @@ androidEclipse{
 dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     flavor1Compile 'com.google.code.gson:gson:2.2.4'
-    flavor2Compile 'com.google.guava:guava:+'
+    flavor2Compile 'com.google.guava:guava:23.0-android'
     compile project(':exampleLibrary')
 
     androidEclipse 'com.google.guava:guava:+'
