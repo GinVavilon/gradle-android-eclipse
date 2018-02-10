@@ -24,10 +24,11 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         AndroidEclipseExtension extension = new AndroidEclipseExtension();
         extension.eclipse = project.eclipse;
         extension.generatedDirs+=[
-         "$buildDir/generated/source/buildConfig",
-         "$buildDir/generated/source/aidl",
-         "$buildDir/generated/source/apt",
-         "$buildDir/generated/source/rs"]
+            "$buildDir/generated/source/buildConfig",
+            "$buildDir/generated/source/aidl",
+            "$buildDir/generated/source/apt",
+            "$buildDir/generated/source/rs"
+        ]
 
 
         project.extensions.add("androidEclipse", extension)
@@ -35,40 +36,54 @@ public class PluginAndraidEclipse implements Plugin<Project> {
         def variants;
 
         if(project.android.hasProperty("applicationVariants")){
-              variants = project.android.applicationVariants;
+            variants = project.android.applicationVariants;
         } else if(project.android.hasProperty("libraryVariants")){
-              variants = project.android.libraryVariants;
+            variants = project.android.libraryVariants;
         } else{
             throw new RuntimeException("Problem with android plugin");
         }
 
+        project.afterEvaluate {
+            def varianProperty = new VariantProperty(project)
+            def variant=varianProperty.selectOrLoad(variants);
+
+            AndroidEclipseVariantConfigurator configurator=new AndroidEclipseVariantConfigurator();
+            configurator.variant = variant
+            configurator.eclipse =  project.eclipse
+            configurator.androidPlugin = project.android
+            configurator.project = project
+            configurator.run()
+
+        }
 
         variants.all { androidVariant ->
 
-                def vname="$androidVariant.name".capitalize()
+            def vname="$androidVariant.name".capitalize()
 
-                def eclipseTask=project.task("eclipse$vname",
-                type: AndroidEclipseTask ,
-                group : 'IDE',
-                description : "Generates all Eclipse files $androidVariant.description "
+            def eclipseTask=project.task("eclipse$vname",
+            type: AndroidEclipseTask ,
+            group : 'IDE',
+            description : "Generates all Eclipse files $androidVariant.description "
 
-                )
+            )
 
-                eclipseTask.finalizedBy 'eclipse'
+            eclipseTask.finalizedBy 'eclipse'
 
-                eclipseTask.doFirst {
-                    variant = androidVariant
-                    eclipse = project.eclipse
-                    androidPlugin = project.android
-                }
+            eclipseTask.doFirst {
+                variant = androidVariant
+                eclipse = project.eclipse
+                androidPlugin = project.android
+            }
 
-                def fullTask=project.task("eclipseAndroid$vname",
-                group : 'IDE',
-                description : "Clear and generates all eclipse files $androidVariant.description ",
-                dependsOn : [project.cleanEclipse, androidVariant.javaCompiler.dependsOn]
-                )
+            def fullTask=project.task("eclipseAndroid$vname",
+            group : 'IDE',
+            description : "Clear and generates all eclipse files $androidVariant.description ",
+            dependsOn : [
+                project.cleanEclipse,
+                androidVariant.javaCompiler.dependsOn]
+            )
 
-                fullTask.finalizedBy eclipseTask
+            fullTask.finalizedBy eclipseTask
         }
 
     }
@@ -78,16 +93,6 @@ public class PluginAndraidEclipse implements Plugin<Project> {
 
         updateEclipseProject(eclipse.project)
         updateEclipseClasspath(eclipse.classpath)
-
-
-        eclipse.classpath {
-            file {
-                withXml {
-                    Node node = it.asNode()
-                    node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
-                }
-            }
-        }
 
     }
 
@@ -106,6 +111,7 @@ public class PluginAndraidEclipse implements Plugin<Project> {
     private updateEclipseProject(EclipseProject project) {
         project.natures.clear()
         project.natures 'org.eclipse.buildship.core.gradleprojectnature'
+        project.buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
         project.natures 'com.android.ide.eclipse.adt.AndroidNature'
         project.natures 'org.eclipse.jdt.core.javanature'
 
