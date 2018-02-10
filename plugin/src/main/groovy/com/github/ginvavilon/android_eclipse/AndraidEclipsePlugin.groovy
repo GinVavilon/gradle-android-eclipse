@@ -6,7 +6,7 @@ import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.EclipseProject
 
-public class PluginAndraidEclipse implements Plugin<Project> {
+public class AndraidEclipsePlugin implements Plugin<Project> {
 
     Project mProject
 
