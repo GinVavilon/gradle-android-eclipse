@@ -34,12 +34,15 @@ public class AndroidEclipseVariantConfigurator {
     '# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):\n'+
     '#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt\n'+
     '\n'+
-    '# Project target.';
+    '# Project target.'
+
+    static final String GEN = 'gen';
 
     public EclipseModel eclipse
     public def variant
     public def androidPlugin
     public def project
+    private def prefixSource=""
 
 
 
@@ -93,23 +96,22 @@ public class AndroidEclipseVariantConfigurator {
         if (resFile!=null){
             eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath);
         }
-        eclipseProject.linkedResource(name: 'gen', type: '2', location: rFile.absolutePath);
+        eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
 
 
 
         final def eclipseClasspathSourceSets = eclipse.classpath.sourceSets
-        def linkedSourceSets = eclipseClasspathSourceSets.create(SOURCES_LINKED)
+        def linkedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_LINKED)
         def libs=new HashSet()
         def configLibs=new HashSet()
         def linkedSources=new HashSet()
+        linkedSources += "gen";
         def projectAbsolutePath = project.file('.').absolutePath
 
         variant.sourceSets.each { sourceSet ->
             final def name=sourceSet.name.toString()
-            SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(PREFIX_SOURCESETS+name);
-            if (mainSourceSet==null){
-                mainSourceSet = eclipseClasspathSourceSets.create(PREFIX_SOURCESETS+name);
-            }
+            def sourceSetName = PREFIX_SOURCESETS+name
+            SourceSet mainSourceSet = getSourceSets(eclipseClasspathSourceSets, sourceSetName)
             sourceSet.javaDirectories.each { dir->
                 boolean areRelated = dir.absolutePath.startsWith(projectAbsolutePath);
                 if (areRelated){
@@ -171,7 +173,7 @@ public class AndroidEclipseVariantConfigurator {
             configurations.libsFromVariant
         ]
 
-        def generatedSourceSets = eclipseClasspathSourceSets.create(SOURCES_GENERATED)
+        def generatedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_GENERATED)
 
         ext.generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
@@ -180,26 +182,25 @@ public class AndroidEclipseVariantConfigurator {
         eclipse.classpath {
             file {
 
-                beforeMerged { classpath ->
-                    classpath.entries.removeAll { entry -> entry.kind == 'src' && linkedSources.contains(entry.path) }
-                }
                 whenMerged {
-
+                    entries.removeAll { entry -> entry.kind == 'src' && linkedSources.contains(entry.path) }
                     for (link in linkedSources) {
                         entries += new SourceFolder(link,null)
                     }
                 }
 
-                //                withXml {
-                //                    def node = it.asNode()
-                //                    for (link in linkedSources) {
-                //                        node.appendNode('classpathentry', [kind: 'src', path: link, exported: true])
-                //                    }
-                //                }
             }
         }
+        new VariantProperty(project, variant).store()
 
+    }
 
+    private SourceSet getSourceSets(def eclipseClasspathSourceSets, def sourceSetName) {
+        SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(sourceSetName);
+        if (mainSourceSet==null){
+            mainSourceSet = eclipseClasspathSourceSets.create(prefixSource+sourceSetName);
+        }
+        return mainSourceSet
     }
 
     private clearProject(def libs,def variant, def flavors, def current , def prefix ){
@@ -266,5 +267,17 @@ public class AndroidEclipseVariantConfigurator {
         }
         properiesWriter.flush()
         properiesWriter.close()
+    }
+
+    public clean() {
+        prefixSource="addedAfterClean"
+        eclipse.classpath.sourceSets.clear()
+        unlinkResource(RES)
+        unlinkResource(GEN)
+        unlinkResource(MANIFEST)
+    }
+
+    private unlinkResource(String name) {
+        eclipse.project.linkedResources.removeIf {it.name==name}
     }
 }

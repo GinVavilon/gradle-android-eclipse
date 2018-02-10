@@ -19,6 +19,7 @@ class AndroidEclipseTask extends DefaultTask {
         configurator.eclipse =  eclipse
         configurator.androidPlugin = androidPlugin
         configurator.project = project
+        configurator.clean()
         configurator.run()
     }
 }
