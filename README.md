@@ -1,4 +1,4 @@
- [ ![Download](https://api.bintray.com/packages/ginvavilon/maven/Android-Eclipse/images/download.svg?version=0.9.3) ](https://bintray.com/ginvavilon/maven/Android-Eclipse/0.9.3/link)
+ [ ![Download](https://api.bintray.com/packages/ginvavilon/maven/Android-Eclipse/images/download.svg?version=0.9.4) ](https://bintray.com/ginvavilon/maven/Android-Eclipse/0.9.4/link)
  
 This is a plugin for Android Project.
 
@@ -8,7 +8,7 @@ Add dependencies
 ```Gradle
 buildscript {
     dependencies {
-        classpath 'com.github.ginvavilon:android-eclipse:0.8.+'
+        classpath 'com.github.ginvavilon:android-eclipse:0.9.4'
     }
 }
 ```
