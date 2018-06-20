@@ -3,8 +3,12 @@
  */
 package com.github.ginvavilon.android_eclipse;
 
+import com.android.build.gradle.api.BaseVariant
+
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.SourceSet
+import org.gradle.internal.impldep.org.apache.ivy.tools.analyser.DependencyAnalyser
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
@@ -39,7 +43,7 @@ public class AndroidEclipseVariantConfigurator {
     static final String GEN = 'gen';
 
     public EclipseModel eclipse
-    public def variant
+    public BaseVariant variant
     public def androidPlugin
     public def project
     private def prefixSource=""
@@ -59,7 +63,7 @@ public class AndroidEclipseVariantConfigurator {
 
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
-        //def manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+
         def manifestFile
         if (ext.manifest == null){
             manifestFile = null
@@ -125,52 +129,25 @@ public class AndroidEclipseVariantConfigurator {
                 }
 
             }
-            def conf=configurations.findByName(name+'Compile');
-            try{
-                if (conf!=null){
-                    project.dependencies{
-                        libsFromVariant conf
-                        configLibs+=conf.files;
-                    }
-                }
-            } catch (Exception e){
-            }
+
 
         }
 
-
-        if(variant.hasProperty('javaCompile')){
-            variant.javaCompile.classpath.each{file ->
-                if (file.exists()){
-                    libs.add(file)
-                }
-
-            }
-        }
-
-        if(variant.hasProperty('compileLibraries')){
-            variant.compileLibraries.each{file ->
-                if (file.exists()){
-                    libs.add(file)
-                }
-
-            }
-        }
-        libs-= configLibs;
-        libs-= configurations.compile.files
-        libs-= configurations.androidEclipse.files
-
-        clearProject(libs,variant,variant.productFlavors,0,"")
-
+        addClasspathConfiguration(variant.compileConfiguration)
+        addClasspathConfiguration(variant.runtimeConfiguration)
+        addClasspathConfiguration(configurations.androidEclipse)
+        
         project.dependencies{
-
-            libsFromVariant configurations.compile
+            libsFromVariant variant.compileConfiguration
+            libsFromVariant variant.runtimeConfiguration
             libsFromVariant configurations.androidEclipse
-            libsFromVariant project.files(libs)
         }
 
         eclipse.classpath.plusConfigurations+=[
             configurations.libsFromVariant
+        ]
+        eclipse.classpath.minusConfigurations+=[
+            configurations.excludeByVariant
         ]
 
         def generatedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_GENERATED)
@@ -195,6 +172,29 @@ public class AndroidEclipseVariantConfigurator {
 
     }
 
+    private addClasspathConfiguration(Configuration config) {
+
+        project.dependencies{
+            config.allDependencies.each({ dependency->
+                if (dependency in ProjectDependency) {
+                    def dependencyProject = dependency.dependencyProject
+                    dependencyProject.afterEvaluate{
+                        def plugins=dependencyProject.plugins
+                        if ((dependency.targetConfiguration == null)
+                        &&(plugins.hasPlugin('com.android.library'))
+                        ) {
+                            ProjectDependency updated= dependency.copy()
+                            updated.targetConfiguration='default'
+                            libsFromVariant updated
+                            excludeByVariant dependency
+                            return
+                        }
+                    }
+                }
+            })
+        }
+    }
+
     private SourceSet getSourceSets(def eclipseClasspathSourceSets, def sourceSetName) {
         SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(sourceSetName);
         if (mainSourceSet==null){
@@ -202,42 +202,6 @@ public class AndroidEclipseVariantConfigurator {
         }
         return mainSourceSet
     }
-
-    private clearProject(def libs,def variant, def flavors, def current , def prefix ){
-        if (current<flavors.size()){
-            def flavor=flavors.get(current)
-            def name = flavor.name
-            clearProject(libs,variant,flavors,current+1, appendCapitalizeSuffix(prefix, flavor.name))
-            clearProject(libs,variant,flavors,current+1, prefix)
-        } else {
-            def typeName= appendCapitalizeSuffix(prefix, variant.buildType.name)
-            clearProject(libs, prefix)
-            clearProject(libs, typeName)
-        }
-    }
-
-    private clearProject(def libs, String name){
-        def compileName = appendCapitalizeSuffix(name, "compile")
-        AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
-        try{
-            project.configurations[compileName]?.dependencies?.each { dependency ->
-                if (dependency instanceof ProjectDependency){
-                    def libProject = dependency.dependencyProject
-
-                    if (!ext.classpathJarProjects.contains(libProject)){
-                        def dir=libProject.buildDir.absolutePath;
-                        libs.removeAll {
-                            project.file(it).absolutePath.startsWith(dir)
-                        }
-                    }
-
-                }
-            }
-        } catch (Exception e) {
-        }
-
-    }
-
 
     private appendCapitalizeSuffix(def prefix, def suffix){
         if (prefix.empty){
