@@ -3,8 +3,10 @@
  */
 package com.github.ginvavilon.android_eclipse;
 
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.SourceSet
@@ -42,11 +44,14 @@ public class AndroidEclipseVariantConfigurator {
 
     static final String GEN = 'gen';
 
+    static final String JAVA_OUTPUT = "build/eclipse-classes";
+
     public EclipseModel eclipse
     public BaseVariant variant
-    public def androidPlugin
+    public BaseExtension androidPlugin
     public def project
     private def prefixSource=""
+    private Set<File> projectLibs=new HashSet<>();
 
 
 
@@ -133,14 +138,20 @@ public class AndroidEclipseVariantConfigurator {
 
         }
 
-        addClasspathConfiguration(variant.compileConfiguration)
-        addClasspathConfiguration(variant.runtimeConfiguration)
+
+        addClasspathConfiguration(variant.compileConfiguration, true)
+        addClasspathConfiguration(variant.runtimeConfiguration, true)
         addClasspathConfiguration(configurations.androidEclipse)
+
+        def classpathLibs = project.files(variant.getCompileClasspath(null))
+                .filter({ File file->
+                   projectLibs.find({ 
+                            file.absolutePath.startsWith(it.absolutePath)
+                        })==null
+                })
         
         project.dependencies{
-            libsFromVariant variant.compileConfiguration
-            libsFromVariant variant.runtimeConfiguration
-            libsFromVariant configurations.androidEclipse
+            libsFromVariant classpathLibs
         }
 
         eclipse.classpath.plusConfigurations+=[
@@ -164,6 +175,12 @@ public class AndroidEclipseVariantConfigurator {
                     for (link in linkedSources) {
                         entries += new SourceFolder(link,null)
                     }
+
+                    entries.each { source ->
+                        if (source.kind == 'src' && source.hasProperty('output')) {
+                            source.output = JAVA_OUTPUT
+                        }
+                    }
                 }
 
             }
@@ -172,23 +189,31 @@ public class AndroidEclipseVariantConfigurator {
 
     }
 
-    private addClasspathConfiguration(Configuration config) {
+    private addClasspathConfiguration(Configuration config, boolean onlyProjects=false) {
 
         project.dependencies{
             config.allDependencies.each({ dependency->
                 if (dependency in ProjectDependency) {
-                    def dependencyProject = dependency.dependencyProject
-                    dependencyProject.afterEvaluate{
+                    Project dependencyProject = dependency.dependencyProject
+                    //dependencyProject.afterEvaluate{
                         def plugins=dependencyProject.plugins
                         if ((dependency.targetConfiguration == null)
-                        &&(plugins.hasPlugin('com.android.library'))
+                        //&&(plugins.hasPlugin('com.android.library'))
                         ) {
                             ProjectDependency updated= dependency.copy()
                             updated.targetConfiguration='default'
                             libsFromVariant updated
-                            excludeByVariant dependency
-                            return
+                            //  excludeByVariant dependency
+                        } else {
+                            libsFromVariant dependency
                         }
+
+                        
+                    //}
+                    projectLibs += dependencyProject.buildDir
+                }else {
+                    if (!onlyProjects) {
+                        libsFromVariant dependency
                     }
                 }
             })
