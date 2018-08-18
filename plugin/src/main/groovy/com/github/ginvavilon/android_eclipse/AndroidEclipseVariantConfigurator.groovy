@@ -59,6 +59,7 @@ public class AndroidEclipseVariantConfigurator {
 
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
+        def generatedDirs = ext.generatedDirs
         //def manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
         def manifestFile
         if (ext.manifest == null){
@@ -89,14 +90,18 @@ public class AndroidEclipseVariantConfigurator {
             resFile = project.file(ext.resLink)
         }
 
-        def rFile=new File("$buildDir/generated/source/r/$pathVariant");
+        def rFile = new File("$buildDir/generated/source/r/$pathVariant");
         if (manifestFile!=null){
             eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
         }
         if (resFile!=null){
             eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath);
         }
-        eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
+
+        if (ext.genR) {
+            eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
+            generatedDirs -= "$buildDir/generated/source/r"
+        }
 
 
 
@@ -105,7 +110,9 @@ public class AndroidEclipseVariantConfigurator {
         def libs=new HashSet()
         def configLibs=new HashSet()
         def linkedSources=new HashSet()
-        linkedSources += "gen";
+        if (ext.genR) {
+            linkedSources += "gen";
+        }
         def projectAbsolutePath = project.file('.').absolutePath
 
         variant.sourceSets.each { sourceSet ->
@@ -138,7 +145,7 @@ public class AndroidEclipseVariantConfigurator {
 
         }
 
-
+        libs+=androidPlugin.bootClasspath
         if(variant.hasProperty('javaCompile')){
             variant.javaCompile.classpath.each{file ->
                 if (file.exists()){
@@ -175,7 +182,8 @@ public class AndroidEclipseVariantConfigurator {
 
         def generatedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_GENERATED)
 
-        ext.generatedDirs.each { dir ->
+
+        generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
         }
 

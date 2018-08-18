@@ -24,6 +24,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         AndroidEclipseExtension extension = new AndroidEclipseExtension();
         extension.eclipse = project.eclipse;
         extension.generatedDirs+=[
+            "$buildDir/generated/source/r",
             "$buildDir/generated/source/buildConfig",
             "$buildDir/generated/source/aidl",
             "$buildDir/generated/source/apt",
@@ -104,7 +105,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         classpath.containers.clear()
         classpath.sourceSets.clear();
         classpath.defaultOutputDir = new File(mProject.buildDir,'eclipse')
-        classpath.containers.add('com.android.ide.eclipse.adt.ANDROID_FRAMEWORK')
+        //      classpath.containers.add('com.android.ide.eclipse.adt.ANDROID_FRAMEWORK')
     }
 
 
@@ -112,7 +113,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         project.natures.clear()
         project.natures 'org.eclipse.buildship.core.gradleprojectnature'
         project.buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
-        project.natures 'com.android.ide.eclipse.adt.AndroidNature'
+        //        project.natures 'com.android.ide.eclipse.adt.AndroidNature'
         project.natures 'org.eclipse.jdt.core.javanature'
 
     }
