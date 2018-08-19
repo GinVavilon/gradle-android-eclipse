@@ -171,6 +171,8 @@ public class AndroidEclipseVariantConfigurator {
             file {
 
                 whenMerged {
+                    entries.unique({ a,b -> a.path.compareTo(b.path)})
+
                     entries.removeAll { entry -> entry.kind == 'src' && linkedSources.contains(entry.path) }
                     for (link in linkedSources) {
                         entries += new SourceFolder(link,null)
