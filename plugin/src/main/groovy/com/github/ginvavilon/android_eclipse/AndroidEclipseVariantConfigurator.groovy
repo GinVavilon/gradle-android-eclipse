@@ -93,7 +93,7 @@ public class AndroidEclipseVariantConfigurator {
         if (ext.resLink == null){
             resFile = null
         } else if (ext.resLink == AndroidEclipseExtension.GENERATED){
-            resFile=new File("$buildDir/intermediates/res/$pathVariant");
+            resFile = this.variant.mergeResources.outputDir
         } else {
             resFile = project.file(ext.resLink)
         }
