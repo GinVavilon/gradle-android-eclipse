@@ -68,6 +68,7 @@ public class AndroidEclipseVariantConfigurator {
 
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
+        def generatedDirs = ext.generatedDirs
 
         def manifestFile
         if (ext.manifest == null){
@@ -98,14 +99,18 @@ public class AndroidEclipseVariantConfigurator {
             resFile = project.file(ext.resLink)
         }
 
-        def rFile=new File("$buildDir/generated/source/r/$pathVariant");
+        def rFile = new File("$buildDir/generated/source/r/$pathVariant");
         if (manifestFile!=null){
             eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
         }
         if (resFile!=null){
             eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath);
         }
-        eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
+
+        if (ext.genR) {
+            eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
+            generatedDirs -= "$buildDir/generated/source/r"
+        }
 
 
 
@@ -114,7 +119,9 @@ public class AndroidEclipseVariantConfigurator {
         def libs=new HashSet()
         def configLibs=new HashSet()
         def linkedSources=new HashSet()
-        linkedSources += "gen";
+        if (ext.genR) {
+            linkedSources += "gen";
+        }
         def projectAbsolutePath = project.file('.').absolutePath
 
         variant.sourceSets.each { sourceSet ->
@@ -142,7 +149,7 @@ public class AndroidEclipseVariantConfigurator {
         addClasspathConfiguration(variant.compileConfiguration, true)
         addClasspathConfiguration(variant.runtimeConfiguration, true)
         addClasspathConfiguration(configurations.androidEclipse)
-
+        
         def classpathLibs = project.files(variant.getCompileClasspath(null))
                 .filter({ File file->
                    projectLibs.find({ 
@@ -152,6 +159,7 @@ public class AndroidEclipseVariantConfigurator {
         
         project.dependencies{
             libsFromVariant classpathLibs
+            libsFromVariant project.files(androidPlugin.bootClasspath)
         }
 
         eclipse.classpath.plusConfigurations+=[
@@ -163,7 +171,8 @@ public class AndroidEclipseVariantConfigurator {
 
         def generatedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_GENERATED)
 
-        ext.generatedDirs.each { dir ->
+
+        generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
         }
 
