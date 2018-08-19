@@ -3,13 +3,14 @@ final VCS_URL = 'https://github.com/GinVavilon/gradle-android-eclipse.git'
 
 final GROUP_ID = 'com.github.ginvavilon'
 final ARTIFACT_ID = 'android-eclipse'
-final VERSION = '0.9.4'
+final VERSION = '0.9.5'
 
 final DESCRIPTION = 'Plugin for generation files for eclipse in android project'
 final NAME = 'Android-Eclipse'
 
 buildscript {
     repositories {
+       google()
        mavenCentral()
        jcenter()
     }
@@ -54,6 +55,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'eclipse'
 
 repositories {
+    google()
     mavenCentral()
     jcenter()
 }
@@ -61,7 +63,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.android.tools.build:gradle:2.3.0'
+    compile 'com.android.tools.build:gradle:3.1.0'
 }
 
 configurations {

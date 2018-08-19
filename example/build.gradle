@@ -3,26 +3,36 @@ apply plugin: 'android-eclipse'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+ 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    
+    flavorDimensions "dimen"
 
     productFlavors {
 
         flavor1 {
+            dimension "dimen"
         }
 
         flavor2 {
+            dimension "dimen"
         }
 
 
@@ -49,20 +59,19 @@ androidEclipse{
     generatedDirs -= "$buildDir/generated/source/rs"
     resLink = res("flavor1")
     pluginType = ANDMORE
-    classpathJarProjects += project(':exampleLibrary')
 }
 
 dependencies {
-    compile 'com.jakewharton:butterknife:7.0.1'
-    flavor1Compile 'com.google.code.gson:gson:2.2.4'
-    flavor2Compile 'com.google.guava:guava:23.0-android'
-    compile project(':exampleLibrary')
+    implementation 'com.jakewharton:butterknife:7.0.1'
+    flavor1Implementation 'com.google.code.gson:gson:2.2.4'
+    flavor2Implementation 'com.google.guava:guava:23.0-android'
+    implementation project(':exampleLibrary')
 
     androidEclipse 'com.google.guava:guava:+'
-    compile 'com.android.support:support-v4:20.0.+'
+    implementation 'com.android.support:support-v4:20.0.+'
 
-    flavor1Compile fileTree(dir: 'src/flavor1/libs', include: '*.jar')
-    flavor2Compile fileTree(dir: 'src/flavor2/libs', include: '*.jar')
+    flavor1Implementation fileTree(dir: 'src/flavor1/libs', include: '*.jar')
+    flavor2Implementation fileTree(dir: 'src/flavor2/libs', include: '*.jar')
 
 }
 
