@@ -57,8 +57,10 @@ public class AndroidEclipseVariantConfigurator {
 
 
     void run() {
-        updateProjectProperties()
         AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
+        if(ext.adtPluginConfigured) {
+            updateProjectProperties()
+        }
 
         def configurations = project.configurations
         def library = androidPlugin in com.android.build.gradle.LibraryExtension;

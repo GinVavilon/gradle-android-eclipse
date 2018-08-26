@@ -32,6 +32,7 @@ class AndroidEclipseExtension {
     def eclipse = null;
     def classpathJarProjects = new HashSet()
     protected Boolean genR = false;
+    protected Boolean adtPluginConfigured = false;
 
     public static String res(String flavor){
         return "src/$flavor/res"
@@ -44,6 +45,7 @@ class AndroidEclipseExtension {
     public void setPluginType(String type){
         clearAndroidPlugin();
         genR = true;
+        adtPluginConfigured = true;
         eclipse.project.natures+= String.valueOf("${type}.AndroidNature");
         eclipse.classpath.containers.add(String.valueOf("${type}.ANDROID_FRAMEWORK"));
     }
