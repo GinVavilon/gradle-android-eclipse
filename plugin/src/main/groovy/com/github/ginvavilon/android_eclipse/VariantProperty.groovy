@@ -75,7 +75,6 @@ class VariantProperty {
             if (parent.exists()){
                 propsFile.createNewFile()
             }
-
         } else {
             def inputStream = propsFile.newDataInputStream()
             try {

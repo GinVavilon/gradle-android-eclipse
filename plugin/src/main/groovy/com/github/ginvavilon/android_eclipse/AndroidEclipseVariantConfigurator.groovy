@@ -3,16 +3,15 @@
  */
 package com.github.ginvavilon.android_eclipse;
 
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.api.BaseVariant
-
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.SourceSet
-import org.gradle.internal.impldep.org.apache.ivy.tools.analyser.DependencyAnalyser
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
+
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.api.BaseVariant
 
 /**
  * @author vbaraznovsky
@@ -87,7 +86,6 @@ public class AndroidEclipseVariantConfigurator {
             if (manifestFile.directory){
                 manifestFile= new File(manifestFile,MANIFEST)
             }
-
         }
 
         def resFile
@@ -139,24 +137,21 @@ public class AndroidEclipseVariantConfigurator {
                         linkedSources += path;
                     }
                 }
-
             }
-
-
         }
 
 
         addClasspathConfiguration(variant.compileConfiguration, true)
         addClasspathConfiguration(variant.runtimeConfiguration, true)
         addClasspathConfiguration(configurations.androidEclipse)
-        
+
         def classpathLibs = project.files(variant.getCompileClasspath(null))
                 .filter({ File file->
-                   projectLibs.find({ 
-                            file.absolutePath.startsWith(it.absolutePath)
-                        })==null
+                    projectLibs.find({
+                        file.absolutePath.startsWith(it.absolutePath)
+                    })==null
                 })
-        
+
         project.dependencies{
             libsFromVariant classpathLibs
             libsFromVariant project.files(androidPlugin.bootClasspath)
@@ -193,11 +188,9 @@ public class AndroidEclipseVariantConfigurator {
                         }
                     }
                 }
-
             }
         }
         new VariantProperty(project, variant).store()
-
     }
 
     private addClasspathConfiguration(Configuration config, boolean onlyProjects=false) {
@@ -207,19 +200,19 @@ public class AndroidEclipseVariantConfigurator {
                 if (dependency in ProjectDependency) {
                     Project dependencyProject = dependency.dependencyProject
                     //dependencyProject.afterEvaluate{
-                        def plugins=dependencyProject.plugins
-                        if ((dependency.targetConfiguration == null)
-                        //&&(plugins.hasPlugin('com.android.library'))
-                        ) {
-                            ProjectDependency updated= dependency.copy()
-                            updated.targetConfiguration='default'
-                            libsFromVariant updated
-                            //  excludeByVariant dependency
-                        } else {
-                            libsFromVariant dependency
-                        }
+                    def plugins=dependencyProject.plugins
+                    if ((dependency.targetConfiguration == null)
+                    //&&(plugins.hasPlugin('com.android.library'))
+                    ) {
+                        ProjectDependency updated= dependency.copy()
+                        updated.targetConfiguration='default'
+                        libsFromVariant updated
+                        //  excludeByVariant dependency
+                    } else {
+                        libsFromVariant dependency
+                    }
 
-                        
+
                     //}
                     projectLibs += dependencyProject.buildDir
                 }else {
