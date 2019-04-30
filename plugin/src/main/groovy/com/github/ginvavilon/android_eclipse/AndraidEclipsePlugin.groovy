@@ -82,7 +82,8 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
             description : "Clear and generates all eclipse files $androidVariant.description ",
             dependsOn : [
                 project.cleanEclipse,
-                androidVariant.javaCompiler.dependsOn]
+                androidVariant.hasProperty('javaCompileProvider')?androidVariant.javaCompileProvider:androidVariant.javaCompiler.dependsOn
+                ]
             )
 
             fullTask.finalizedBy eclipseTask
