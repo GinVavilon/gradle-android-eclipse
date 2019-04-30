@@ -3,7 +3,7 @@ final VCS_URL = 'https://github.com/GinVavilon/gradle-android-eclipse.git'
 
 final GROUP_ID = 'com.github.ginvavilon'
 final ARTIFACT_ID = 'android-eclipse'
-final VERSION = '0.9.7'
+final VERSION = '0.9.8-snapshot'
 
 final DESCRIPTION = 'Plugin for generation files for eclipse in android project'
 final NAME = 'Android-Eclipse'
