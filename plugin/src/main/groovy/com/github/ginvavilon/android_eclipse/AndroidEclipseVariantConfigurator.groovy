@@ -94,7 +94,11 @@ public class AndroidEclipseVariantConfigurator {
         if (ext.resLink == null){
             resFile = null
         } else if (ext.resLink == AndroidEclipseExtension.GENERATED){
-            resFile = this.variant.mergeResources.outputDir
+            if (this.variant.hasProperty('mergeResourcesProvider')) {
+                resFile = project.tasks[this.variant.mergeResourcesProvider.name]?.outputDir
+            } else {
+                resFile = this.variant.mergeResources.outputDir
+            }
         } else {
             resFile = project.file(ext.resLink)
         }
