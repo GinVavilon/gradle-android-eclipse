@@ -1,0 +1,3 @@
+project.ext{
+    androidVersionTools = '3.4.0'
+}

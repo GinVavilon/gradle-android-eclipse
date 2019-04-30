@@ -103,7 +103,22 @@ public class AndroidEclipseVariantConfigurator {
             resFile = project.file(ext.resLink)
         }
 
-        def rFile = new File("$buildDir/generated/source/r/$pathVariant");
+        
+        def outputSources = variant.getOutputs().collect {
+            if (it.hasProperty('processResourcesProvider')) {
+                project.tasks[it.processResourcesProvider.name].sourceOutputDir
+            } else {
+                null
+            }
+        }.findAll { it != null }
+
+        def rFile 
+        if (outputSources.size() > 0) {
+            rFile = outputSources[0]
+        } else {
+            rFile = new File("$buildDir/generated/source/r/$pathVariant")
+        }
+        
         if (manifestFile!=null){
             eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
         }
@@ -114,6 +129,7 @@ public class AndroidEclipseVariantConfigurator {
         if (ext.genR) {
             eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
             generatedDirs -= "$buildDir/generated/source/r"
+            outputSources -= rFile
         }
 
 
@@ -175,6 +191,12 @@ public class AndroidEclipseVariantConfigurator {
 
         generatedDirs.each { dir ->
             generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
+        }
+
+        outputSources.each {
+            if (it.isDirectory()) {
+                generatedSourceSets.getJava().srcDir(it)
+            }
         }
 
         eclipse.classpath {
