@@ -1,3 +1,4 @@
+apply from: "${rootDir.parentFile}/properties.gradle"
 repositories {
     mavenCentral()
     google()

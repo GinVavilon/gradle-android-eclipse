@@ -1,11 +1,14 @@
+
 buildscript {
+    apply from :'properties.gradle'
     repositories {
         jcenter()
         google()
     }
     
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath "com.android.tools.build:gradle:$androidVersionTools"
+
     }
 }
 
