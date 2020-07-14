@@ -172,12 +172,12 @@ public class AndroidEclipseVariantConfigurator {
                 })
 
         project.dependencies{
-            libsFromVariant classpathLibs
-            libsFromVariant project.files(androidPlugin.bootClasspath)
+            variantEclipseConfiguration classpathLibs
+            variantEclipseConfiguration project.files(androidPlugin.bootClasspath)
         }
 
         eclipse.classpath.plusConfigurations+=[
-            configurations.libsFromVariant
+            configurations.variantEclipseConfiguration
         ]
         eclipse.classpath.minusConfigurations+=[
             configurations.excludeByVariant
@@ -256,10 +256,10 @@ public class AndroidEclipseVariantConfigurator {
                     ) {
                         ProjectDependency updated= dependency.copy()
                         updated.targetConfiguration='default'
-                        libsFromVariant updated
+                        variantEclipseConfiguration updated
                         //  excludeByVariant dependency
                     } else {
-                        libsFromVariant dependency
+                        variantEclipseConfiguration dependency
                     }
 
 
@@ -267,7 +267,7 @@ public class AndroidEclipseVariantConfigurator {
                     projectLibs += dependencyProject.buildDir
                 } else {
                     if (!onlyProjects) {
-                        libsFromVariant dependency
+                        variantEclipseConfiguration dependency
                     }
                 }
             })

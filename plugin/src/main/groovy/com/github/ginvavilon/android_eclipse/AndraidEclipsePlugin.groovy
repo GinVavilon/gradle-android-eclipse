@@ -17,7 +17,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         //project.apply(plugin: 'android')
         project.apply(plugin: 'eclipse')
         project.configurations {androidEclipse}
-        project.configurations {libsFromVariant}
+        project.configurations {variantEclipseConfiguration}
         project.configurations {testVariantEclipseConfiguration}
         project.configurations {excludeByVariant}
         updateEclipse(project.eclipse)
