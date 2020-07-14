@@ -6,6 +6,7 @@ package com.github.ginvavilon.android_eclipse;
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.file.FileSystemLocationProperty
 import org.gradle.api.tasks.SourceSet
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
@@ -122,6 +123,10 @@ public class AndroidEclipseVariantConfigurator {
         if (manifestFile!=null){
             eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
         }
+        if (resFile instanceof FileSystemLocationProperty){
+            resFile = resFile.getAsFile().get()
+        }
+
         if (resFile!=null){
             eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath);
         }
