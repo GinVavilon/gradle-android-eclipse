@@ -18,6 +18,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         project.apply(plugin: 'eclipse')
         project.configurations {androidEclipse}
         project.configurations {libsFromVariant}
+        project.configurations {testVariantEclipseConfiguration}
         project.configurations {excludeByVariant}
         updateEclipse(project.eclipse)
         def buildDir=project.buildDir;
