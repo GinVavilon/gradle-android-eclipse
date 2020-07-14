@@ -37,6 +37,13 @@ android {
 
 
     }
+    
+    sourceSets {
+        main {
+            java.srcDir "../src/ext/java"
+        }
+
+    }
 }
 
 eclipse {

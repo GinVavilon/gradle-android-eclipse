@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.ginvavilon.android_eclipse;
+package com.github.ginvavilon.android_eclipse
 
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.BaseVariant
@@ -42,16 +42,16 @@ public class AndroidEclipseVariantConfigurator {
     '\n'+
     '# Project target.'
 
-    static final String GEN = 'gen';
+    static final String GEN = 'gen'
 
-    static final String JAVA_OUTPUT = "build/eclipse-classes";
+    static final String JAVA_OUTPUT = "build/eclipse-classes"
 
     public EclipseModel eclipse
     public BaseVariant variant
     public TestedExtension androidPlugin
     public def project
     private def prefixSource=""
-    private Set<File> projectLibs=new HashSet<>();
+    private Set<File> projectLibs=new HashSet<>()
 
 
 
@@ -64,9 +64,9 @@ public class AndroidEclipseVariantConfigurator {
         }
 
         def configurations = project.configurations
-        def library = androidPlugin in com.android.build.gradle.LibraryExtension;
+        def library = androidPlugin in com.android.build.gradle.LibraryExtension
 
-        def buildDir=project.buildDir;
+        def buildDir=project.buildDir
 
         def eclipseProject = eclipse.project
         def pathVariant = variant.dirName
@@ -77,9 +77,9 @@ public class AndroidEclipseVariantConfigurator {
             manifestFile = null
         } else if (ext.manifest == AndroidEclipseExtension.GENERATED){
             if (library){
-                manifestFile=new File("$buildDir/intermediates/manifests/aapt/$pathVariant/AndroidManifest.xml");
+                manifestFile=new File("$buildDir/intermediates/manifests/aapt/$pathVariant/AndroidManifest.xml")
             } else {
-                manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml");
+                manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml")
             }
         } else {
             manifestFile = project.file(ext.manifest
@@ -121,18 +121,18 @@ public class AndroidEclipseVariantConfigurator {
         }
         
         if (manifestFile!=null){
-            eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath);
+            eclipseProject.linkedResource(name: MANIFEST, type: '1', location: manifestFile.absolutePath)
         }
         if (resFile instanceof FileSystemLocationProperty){
             resFile = resFile.getAsFile().get()
         }
 
         if (resFile!=null){
-            eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath);
+            eclipseProject.linkedResource(name: RES, type: '2', location: resFile.absolutePath)
         }
 
         if (ext.genR) {
-            eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath);
+            eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath)
             generatedDirs -= "$buildDir/generated/source/r"
             outputSources -= rFile
         }
@@ -143,11 +143,10 @@ public class AndroidEclipseVariantConfigurator {
         def linkedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_LINKED)
         def libs=new HashSet()
         def configLibs=new HashSet()
-        def linkedSources = new HashSet()
+        def sourceContainer = new SourceContainer(project, eclipseProject)
         if (ext.genR) {
-            linkedSources += "gen";
+            sourceContainer.addLinkedSource('gen')
         }
-        def projectAbsolutePath = project.file('.').absolutePath
 
         variant.sourceSets.each { sourceSet ->
 
@@ -155,15 +154,8 @@ public class AndroidEclipseVariantConfigurator {
             def sourceSetName = PREFIX_SOURCESETS+name
             SourceSet mainSourceSet = getSourceSets(eclipseClasspathSourceSets, sourceSetName)
             sourceSet.javaDirectories.each { dir->
-                boolean areRelated = dir.absolutePath.startsWith(projectAbsolutePath);
-                if (areRelated){
-                    mainSourceSet.getJava().srcDir(dir);
-                } else {
-                    if (dir.exists()){
-                        def path = String.valueOf("src-$name")
-                        eclipseProject.linkedResource(name: path, type: '2', location: dir.absolutePath);
-                        linkedSources += path;
-                    }
+                sourceContainer.getProjectPath(dir, name)?.with {
+                    mainSourceSet.getJava().srcDir(it)
                 }
             }
         }
@@ -195,7 +187,7 @@ public class AndroidEclipseVariantConfigurator {
 
 
         generatedDirs.each { dir ->
-            generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"));
+            generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"))
         }
 
         outputSources.each {
@@ -211,15 +203,8 @@ public class AndroidEclipseVariantConfigurator {
             def sourceSetName = PREFIX_SOURCESETS+name
             SourceSet mainSourceSet = getSourceSets(eclipseClasspathSourceSets, sourceSetName)
             sourceSet.javaDirectories.each { dir->
-                boolean areRelated = dir.absolutePath.startsWith(projectAbsolutePath);
-                if (areRelated){
-                    mainSourceSet.getJava().srcDir(dir);
-                } else {
-                    if (dir.exists()){
-                        def path = String.valueOf("src-test-$name")
-                        eclipseProject.linkedResource(name: path, type: '2', location: dir.absolutePath);
-                        linkedSources += path;
-                    }
+                sourceContainer.getProjectPath(dir, name)?.with {
+                    mainSourceSet.getJava().srcDir(it)
                 }
             }
         }
@@ -237,14 +222,19 @@ public class AndroidEclipseVariantConfigurator {
                 whenMerged {
                     entries.unique({ a,b -> a.path.compareTo(b.path)})
 
-                    entries.removeAll { entry -> entry.kind == 'src' && linkedSources.contains(entry.path) }
-                    for (link in linkedSources) {
+                    entries.removeAll { entry -> entry.kind == 'src' && sourceContainer.isLink(entry.path) }
+                    
+                    for (link in sourceContainer.linkedSources) {
                         entries += new SourceFolder(link,null)
                     }
 
                     entries.each { source ->
-                        if (source.kind == 'src' && source.hasProperty('output')) {
-                            source.output = (JAVA_OUTPUT+'/'+source.output)
+                        if (source.kind == 'src'
+                        && source.hasProperty('output')
+                        && (source.output != null)
+                        && !source.output?.startsWith(JAVA_OUTPUT)) {
+                            println "!!! ${source.output}"
+                            source.output = JAVA_OUTPUT+ "/" + source.output?:""
                         }
                     }
                 }
@@ -291,16 +281,15 @@ public class AndroidEclipseVariantConfigurator {
                     variant.compileConfiguration.allDependencies +
                     variant.runtimeConfiguration.allDependencies
             (config.allDependencies - exclude).each { dependency->
-                println "--- ${dependency.name}"
                 testVariantEclipseConfiguration dependency
             }
         }
     }
 
     private SourceSet getSourceSets(def eclipseClasspathSourceSets, def sourceSetName) {
-        SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(sourceSetName);
+        SourceSet mainSourceSet = eclipseClasspathSourceSets.findByName(sourceSetName)
         if (mainSourceSet==null){
-            mainSourceSet = eclipseClasspathSourceSets.create(prefixSource+sourceSetName);
+            mainSourceSet = eclipseClasspathSourceSets.create(prefixSource+sourceSetName)
         }
         return mainSourceSet
     }

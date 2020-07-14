@@ -21,10 +21,10 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         project.configurations {testVariantEclipseConfiguration}
         project.configurations {excludeByVariant}
         updateEclipse(project.eclipse)
-        def buildDir=project.buildDir;
+        def buildDir=project.buildDir
 
-        AndroidEclipseExtension extension = new AndroidEclipseExtension();
-        extension.eclipse = project.eclipse;
+        AndroidEclipseExtension extension = new AndroidEclipseExtension()
+        extension.eclipse = project.eclipse
         extension.generatedDirs+=[
             "$buildDir/generated/source/r",
             "$buildDir/generated/source/buildConfig",
@@ -35,22 +35,21 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
 
 
         project.extensions.add("androidEclipse", extension)
-
-        def variants;
+        def variants
 
         if(project.android.hasProperty("applicationVariants")){
-            variants = project.android.applicationVariants;
+            variants = project.android.applicationVariants
         } else if(project.android.hasProperty("libraryVariants")){
-            variants = project.android.libraryVariants;
+            variants = project.android.libraryVariants
         } else{
-            throw new RuntimeException("Problem with android plugin");
+            throw new RuntimeException("Problem with android plugin")
         }
 
         project.afterEvaluate {
             def varianProperty = new VariantProperty(project)
-            def variant=varianProperty.selectOrLoad(variants);
+            def variant=varianProperty.selectOrLoad(variants)
 
-            AndroidEclipseVariantConfigurator configurator=new AndroidEclipseVariantConfigurator();
+            AndroidEclipseVariantConfigurator configurator=new AndroidEclipseVariantConfigurator()
             configurator.variant = variant
             configurator.eclipse =  project.eclipse
             configurator.androidPlugin = project.android
@@ -106,7 +105,7 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         classpath.downloadSources = true
         classpath.downloadJavadoc = true
         classpath.containers.clear()
-        classpath.sourceSets.clear();
+        classpath.sourceSets.clear()
         classpath.defaultOutputDir = new File(mProject.buildDir,'eclipse')
         //      classpath.containers.add('com.android.ide.eclipse.adt.ANDROID_FRAMEWORK')
     }
