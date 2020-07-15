@@ -194,26 +194,28 @@ public class AndroidEclipseVariantConfigurator {
                 generatedSourceSets.getJava().srcDir(it)
             }
         }
+        if (ext.junitTest) {
+            BaseVariant testVariant = androidPlugin.unitTestVariants.find { it.getTestedVariant() == variant }
+            testVariant.sourceSets.each { sourceSet ->
 
-        BaseVariant testVariant = androidPlugin.unitTestVariants.find { it.getTestedVariant() == variant }
-        testVariant.sourceSets.each { sourceSet ->
-
-            final def name=sourceSet.name.toString()
-            def sourceSetName = PREFIX_SOURCESETS+name
-            SourceSet mainSourceSet = getSourceSets(eclipseClasspathSourceSets, sourceSetName)
-            sourceSet.javaDirectories.each { dir->
-                sourceContainer.getProjectPath(dir, name)?.with {
-                    mainSourceSet.getJava().srcDir(it)
+                final def name=sourceSet.name.toString()
+                def sourceSetName = PREFIX_SOURCESETS+name
+                SourceSet mainSourceSet = getSourceSets(eclipseClasspathSourceSets, sourceSetName)
+                sourceSet.javaDirectories.each { dir->
+                    sourceContainer.getProjectPath(dir, name)?.with {
+                        mainSourceSet.getJava().srcDir(it)
+                    }
                 }
             }
+
+
+            addTestConfiguration(testVariant.compileConfiguration)
+            addTestConfiguration(testVariant.runtimeConfiguration)
+
+            eclipse.classpath.plusConfigurations+=[
+                configurations.testVariantEclipseConfiguration
+            ]
         }
-
-        addTestConfiguration(testVariant.compileConfiguration)
-        addTestConfiguration(testVariant.runtimeConfiguration)
-
-        eclipse.classpath.plusConfigurations+=[
-            configurations.testVariantEclipseConfiguration
-        ]
 
         eclipse.classpath {
             file {

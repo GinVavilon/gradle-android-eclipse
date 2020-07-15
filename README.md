@@ -102,6 +102,9 @@ androidEclipse{
     
     // List projects with jar in classpath (duplication of project classpath as jar classpath)
     classpathJarProjects += project(':exampleLibrary')
+
+    // For remove junitTest form classpath
+    junitTest = false
 }
 
 dependencies {

@@ -70,6 +70,7 @@ androidEclipse{
     manifest = merged
     generatedDirs -= "$buildDir/generated/source/rs"
     resLink = res("flavor1")
+    junitTest = false
   //  pluginType = ANDMORE
 }
 
