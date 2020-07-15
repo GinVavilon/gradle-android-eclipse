@@ -105,6 +105,12 @@ androidEclipse{
 
     // For remove junitTest form classpath
     junitTest = false
+    
+    // Enable nature for kotlin. The default depends on if plugin 'kotlin-android' is applied
+    useKotlin = true
+    
+    // Enable kotlin builder. (Default is false)
+    kotlinBuilder = true
 }
 
 dependencies {

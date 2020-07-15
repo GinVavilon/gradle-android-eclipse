@@ -32,6 +32,8 @@ class AndroidEclipseExtension {
     def eclipse = null
     def classpathJarProjects = new HashSet()
     boolean junitTest = true
+    Boolean useKotlin = null
+    boolean kotlinBuilder = false
     protected Boolean genR = false
     protected Boolean adtPluginConfigured = false
 

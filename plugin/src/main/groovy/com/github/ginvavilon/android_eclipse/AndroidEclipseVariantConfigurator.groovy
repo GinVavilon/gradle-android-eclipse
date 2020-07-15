@@ -61,6 +61,10 @@ public class AndroidEclipseVariantConfigurator {
         if(ext.adtPluginConfigured) {
             updateProjectProperties()
         }
+        
+        if(ext.useKotlin?:project.plugins.hasPlugin('kotlin-android')) {
+            updateKotlinProject(ext.kotlinBuilder)
+        }
 
         def configurations = project.configurations
         def library = androidPlugin in com.android.build.gradle.LibraryExtension
@@ -352,5 +356,31 @@ public class AndroidEclipseVariantConfigurator {
 
     private unlinkResource(String name) {
         eclipse.project.linkedResources.removeIf {it.name==name}
+    }
+    
+    
+    private updateKotlinProject(boolean withBuild = false) {
+        eclipse.project.with {
+
+            natures 'org.jetbrains.kotlin.core.kotlinNature'
+            if (withBuild) {
+                buildCommand 'org.jetbrains.kotlin.ui.kotlinBuilder'
+                linkedResource name: 'kotlin_bin', type: '2', location: 'org.jetbrains.kotlin.core.filesystem:/'+ name +'/kotlin_bin'
+            }
+
+        }
+        if (withBuild) {
+            eclipse.jdt {
+                file {
+                    withProperties { properties ->
+                        properties['org.eclipse.jdt.core.builder.resourceCopyExclusionFilter'] = '*.kt'
+                    }
+                }
+
+            }
+            eclipse.classpath {
+                containers 'org.jetbrains.kotlin.core.KOTLIN_CONTAINER'
+            }
+        }
     }
 }

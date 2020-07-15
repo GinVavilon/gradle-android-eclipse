@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'android-eclipse'
 
 android {
@@ -71,10 +72,13 @@ androidEclipse{
     generatedDirs -= "$buildDir/generated/source/rs"
     resLink = res("flavor1")
     junitTest = false
+    useKotlin = true
+    kotlinBuilder = true
   //  pluginType = ANDMORE
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'com.jakewharton:butterknife:7.0.1'
     flavor1Implementation 'com.google.code.gson:gson:2.2.4'
     flavor2Implementation 'com.google.guava:guava:23.0-android'
