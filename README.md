@@ -93,7 +93,7 @@ androidEclipse{
     //Directories for generated source
     generatedDirs-="$buildDir/generated/source/rs"
     
-    // Link to res folder    
+    // Link to res folder
     resLink = res("flavor1")
     //resLink = merged
     
@@ -102,11 +102,17 @@ androidEclipse{
     
     // List projects with jar in classpath (duplication of project classpath as jar classpath)
     classpathJarProjects += project(':exampleLibrary')
+
+    // For remove junitTest form classpath
+    junitTest = false
 }
 
 dependencies {
    //library for eclipse (skip compile)
    androidEclipse 'library'
+   
+   //library for ignore add to eclipse (only compile)
+   ignoreAndroidEclipse 'dependency'
 
 }
 ```
