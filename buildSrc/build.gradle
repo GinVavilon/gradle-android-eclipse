@@ -1,9 +1,11 @@
 apply from: "${rootDir.parentFile}/properties.gradle"
 repositories {
+    jcenter()
     mavenCentral()
     google()
 }
 
 dependencies {
-    compile project(':plugin')
+    implementation "com.android.tools.build:gradle:$androidVersionTools"
+    implementation project(':plugin')
 }

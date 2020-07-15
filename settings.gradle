@@ -1,2 +1,3 @@
-include ':plugin', ':exampleLibrary'
+include ':plugin'
+include ':exampleLibrary', ':exampleJavaLib'
 include ':example'

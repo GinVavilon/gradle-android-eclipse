@@ -1,4 +1,4 @@
- [ ![Download](https://api.bintray.com/packages/ginvavilon/maven/Android-Eclipse/images/download.svg?version=0.9.5) ](https://bintray.com/ginvavilon/maven/Android-Eclipse/0.9.6/link)
+ [ ![Download](https://api.bintray.com/packages/ginvavilon/maven/Android-Eclipse/images/download.svg?version=0.9.9) ](https://bintray.com/ginvavilon/maven/Android-Eclipse/0.9.9/link)
  
 This is a plugin for Android Project.
 
@@ -8,7 +8,7 @@ Add dependencies
 ```Gradle
 buildscript {
     dependencies {
-        classpath 'com.github.ginvavilon:android-eclipse:0.9.6'
+        classpath 'com.github.ginvavilon:android-eclipse:0.9.9'
     }
 }
 ```
@@ -93,7 +93,7 @@ androidEclipse{
     //Directories for generated source
     generatedDirs-="$buildDir/generated/source/rs"
     
-    // Link to res folder    
+    // Link to res folder
     resLink = res("flavor1")
     //resLink = merged
     
@@ -102,11 +102,17 @@ androidEclipse{
     
     // List projects with jar in classpath (duplication of project classpath as jar classpath)
     classpathJarProjects += project(':exampleLibrary')
+
+    // For remove junitTest form classpath
+    junitTest = false
 }
 
 dependencies {
    //library for eclipse (skip compile)
    androidEclipse 'library'
+   
+   //library for ignore add to eclipse (only compile)
+   ignoreAndroidEclipse 'dependency'
 
 }
 ```

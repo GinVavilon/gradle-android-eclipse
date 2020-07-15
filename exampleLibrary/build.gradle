@@ -17,6 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    
+     lintOptions {
+          abortOnError false
+      }
+    
 }
 
 eclipse {
@@ -37,4 +42,5 @@ androidEclipse{
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-v4:20.0.+'
+    testImplementation 'junit:junit:4.12'
 }
