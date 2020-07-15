@@ -11,7 +11,9 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileSystemLocationProperty
 import org.gradle.api.tasks.SourceSet
+import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
+import org.gradle.plugins.ide.eclipse.model.ProjectDependency as EclipseProjectDependency
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
 /**
@@ -48,13 +50,11 @@ public class AndroidEclipseVariantConfigurator {
     public EclipseModel eclipse
     public BaseVariant variant
     public TestedExtension androidPlugin
-    public def project
+    public Project project
     private def prefixSource=""
     private Set<File> projectLibs=new HashSet<>()
-
-
-
-
+    private Set<Project> dependedProjects = new HashSet<>()
+    private Set ignoreDependencies = new HashSet<>()
 
     void run() {
         AndroidEclipseExtension ext=project.extensions.getByName('androidEclipse')
@@ -137,9 +137,8 @@ public class AndroidEclipseVariantConfigurator {
         }
 
 
-
+        ignoreDependencies += configurations.ignoreAndroidEclipse.allDependencies
         final def eclipseClasspathSourceSets = eclipse.classpath.sourceSets
-        def linkedSourceSets = getSourceSets(eclipseClasspathSourceSets,SOURCES_LINKED)
         def libs=new HashSet()
         def configLibs=new HashSet()
         def sourceContainer = new SourceContainer(project, eclipseProject)
@@ -167,7 +166,7 @@ public class AndroidEclipseVariantConfigurator {
                 .filter({ File file->
                     projectLibs.find({
                         file.absolutePath.startsWith(it.absolutePath)
-                    })==null
+                    }) == null
                 })
 
         project.dependencies{
@@ -179,7 +178,8 @@ public class AndroidEclipseVariantConfigurator {
             configurations.variantEclipseConfiguration
         ]
         eclipse.classpath.minusConfigurations+=[
-            configurations.excludeByVariant
+            configurations.excludeByVariant,
+            configurations.ignoreAndroidEclipse
         ]
 
         def generatedSourceSets = getSourceSets(eclipseClasspathSourceSets, SOURCES_GENERATED)
@@ -219,8 +219,22 @@ public class AndroidEclipseVariantConfigurator {
             file {
 
                 whenMerged {
-                    entries.unique({ a,b -> a.path.compareTo(b.path)})
 
+                    dependedProjects.each { dependedProject ->
+                        String path
+
+                        if (dependedProject.plugins.hasPlugin(EclipsePlugin.class)) {
+                            path = '/' + dependedProject.eclipse.project.name
+                        } else {
+                            path = '/'+ dependedProject.name
+                        }
+                        if (entries.find {it.path == path} == null) {
+                            entries += new EclipseProjectDependency(path)
+                        }
+                    }
+                    
+                    entries.unique({ a,b -> a.path.compareTo(b.path)})
+                    
                     entries.removeAll { entry -> entry.kind == 'src' && sourceContainer.isLink(entry.path) }
                     
                     for (link in sourceContainer.linkedSources) {
@@ -242,13 +256,16 @@ public class AndroidEclipseVariantConfigurator {
     }
 
     private addClasspathConfiguration(Configuration config, boolean onlyProjects=false) {
-
         project.dependencies{
             config.allDependencies.each({ dependency->
                 if (dependency in ProjectDependency) {
                     Project dependencyProject = dependency.dependencyProject
+
+                    if (!ignoreDependencies.contains(dependency)){
+                        dependedProjects.add(dependencyProject)
+                    }
                     //dependencyProject.afterEvaluate{
-                    def plugins=dependencyProject.plugins
+                    def plugins = dependencyProject.plugins
                     if ((dependency.targetConfiguration == null)
                     //&&(plugins.hasPlugin('com.android.library'))
                     ) {
@@ -277,7 +294,8 @@ public class AndroidEclipseVariantConfigurator {
         project.dependencies {
             def exclude =
                     variant.compileConfiguration.allDependencies +
-                    variant.runtimeConfiguration.allDependencies
+                    variant.runtimeConfiguration.allDependencies +
+                    ignoreDependencies
             (config.allDependencies - exclude).each { dependency->
                 testVariantEclipseConfiguration dependency
             }

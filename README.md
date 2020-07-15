@@ -93,7 +93,7 @@ androidEclipse{
     //Directories for generated source
     generatedDirs-="$buildDir/generated/source/rs"
     
-    // Link to res folder    
+    // Link to res folder
     resLink = res("flavor1")
     //resLink = merged
     
@@ -107,6 +107,9 @@ androidEclipse{
 dependencies {
    //library for eclipse (skip compile)
    androidEclipse 'library'
+   
+   //library for ignore add to eclipse (only compile)
+   ignoreAndroidEclipse 'dependency'
 
 }
 ```

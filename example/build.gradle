@@ -44,6 +44,11 @@ android {
         }
 
     }
+    
+     lintOptions {
+          abortOnError false
+      }
+    
 }
 
 eclipse {
@@ -65,7 +70,7 @@ androidEclipse{
     manifest = merged
     generatedDirs -= "$buildDir/generated/source/rs"
     resLink = res("flavor1")
-    pluginType = ANDMORE
+  //  pluginType = ANDMORE
 }
 
 dependencies {
@@ -73,6 +78,7 @@ dependencies {
     flavor1Implementation 'com.google.code.gson:gson:2.2.4'
     flavor2Implementation 'com.google.guava:guava:23.0-android'
     implementation project(':exampleLibrary')
+    implementation project(':exampleJavaLib')
 
     androidEclipse 'com.google.guava:guava:+'
     implementation 'com.android.support:support-v4:20.0.+'
