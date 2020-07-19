@@ -29,11 +29,12 @@ public class AndraidEclipsePlugin implements Plugin<Project> {
         AndroidEclipseExtension extension = new AndroidEclipseExtension()
         extension.eclipse = project.eclipse
         extension.generatedDirs+=[
-            "$buildDir/generated/source/r",
-            "$buildDir/generated/source/buildConfig",
-            "$buildDir/generated/source/aidl",
-            "$buildDir/generated/source/apt",
-            "$buildDir/generated/source/rs"
+            "$buildDir/generated/source/r/%variantDirName%",
+            "$buildDir/generated/ap_generated_sources/%variantName%/out",
+            "$buildDir/generated/source/buildConfig/%variantDirName%",
+            "$buildDir/generated/source/aidl/%variantDirName%",
+            "$buildDir/generated/source/apt/%variantDirName%",
+            "$buildDir/generated/source/rs/%variantDirName%"
         ]
 
 

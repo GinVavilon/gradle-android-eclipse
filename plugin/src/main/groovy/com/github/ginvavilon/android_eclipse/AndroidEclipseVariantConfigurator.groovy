@@ -72,7 +72,7 @@ public class AndroidEclipseVariantConfigurator {
         def buildDir=project.buildDir
 
         def eclipseProject = eclipse.project
-        def pathVariant = variant.dirName
+        def variantDirName = variant.dirName
         def generatedDirs = ext.generatedDirs
 
         def manifestFile
@@ -80,15 +80,12 @@ public class AndroidEclipseVariantConfigurator {
             manifestFile = null
         } else if (ext.manifest == AndroidEclipseExtension.GENERATED){
             if (library){
-                manifestFile=new File("$buildDir/intermediates/manifests/aapt/$pathVariant/AndroidManifest.xml")
+                manifestFile=new File("$buildDir/intermediates/manifests/aapt/$variantDirName/AndroidManifest.xml")
             } else {
-                manifestFile=new File("$buildDir/intermediates/manifests/full/$pathVariant/AndroidManifest.xml")
+                manifestFile=new File("$buildDir/intermediates/manifests/full/$variantDirName/AndroidManifest.xml")
             }
         } else {
-            manifestFile = project.file(ext.manifest
-                    .replaceAll('%buildDir%',"$buildDir")
-                    .replaceAll('%pathVariant%',"$pathVariant")
-                    )
+            manifestFile = variantFile(ext.manifest)
             if (manifestFile.directory){
                 manifestFile= new File(manifestFile,MANIFEST)
             }
@@ -120,7 +117,7 @@ public class AndroidEclipseVariantConfigurator {
         if (outputSources.size() > 0) {
             rFile = outputSources[0]
         } else {
-            rFile = new File("$buildDir/generated/source/r/$pathVariant")
+            rFile = new File("$buildDir/generated/source/r/$variantDirName")
         }
         
         if (manifestFile!=null){
@@ -136,7 +133,7 @@ public class AndroidEclipseVariantConfigurator {
 
         if (ext.genR) {
             eclipseProject.linkedResource(name: GEN, type: '2', location: rFile.absolutePath)
-            generatedDirs -= "$buildDir/generated/source/r"
+            generatedDirs -= "$buildDir/generated/source/r/%variantDirName%"
             outputSources -= rFile
         }
 
@@ -190,7 +187,7 @@ public class AndroidEclipseVariantConfigurator {
 
 
         generatedDirs.each { dir ->
-            generatedSourceSets.getJava().srcDir(project.file("$dir/$pathVariant"))
+            generatedSourceSets.getJava().srcDir(variantFile(dir))
         }
 
         outputSources.each {
@@ -259,6 +256,14 @@ public class AndroidEclipseVariantConfigurator {
             }
         }
         new VariantProperty(project, variant).store()
+    }
+    
+    private File variantFile(String originPath) {
+        return project.file(originPath
+                    .replaceAll('%buildDir%',"${project.buildDir}")
+                    .replaceAll('%variantDirName%',"${variant.dirName}")
+                    .replaceAll('%variantName%',"${variant.name}")
+                    )
     }
 
     private addClasspathConfiguration(Configuration config, boolean onlyProjects=false) {

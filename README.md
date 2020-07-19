@@ -91,7 +91,8 @@ androidEclipse{
     manifest = merged
 
     //Directories for generated source
-    generatedDirs-="$buildDir/generated/source/rs"
+    // Supported macros: %variantDirName%, %buildDir%, %variantName%
+    generatedDirs-="$buildDir/generated/source/rs/%variantDirName%"
     
     // Link to res folder
     resLink = res("flavor1")

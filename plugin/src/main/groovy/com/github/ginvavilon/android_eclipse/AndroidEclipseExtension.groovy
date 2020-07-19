@@ -42,7 +42,7 @@ class AndroidEclipseExtension {
     }
 
     public static String generated(String type){
-        return "%buildDir%/intermediates/manifests/$type/%pathVariant%/AndroidManifest.xml"
+        return "%buildDir%/intermediates/manifests/$type/%variantDirName%/AndroidManifest.xml"
     }
 
     public void setPluginType(String type){
