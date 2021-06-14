@@ -5,7 +5,7 @@ local.properties
 .DS_Store
 build/
 bin/
-gradle.properties
+/gradle.properties
 /gradle-app.setting
 /.project
 /.classpath

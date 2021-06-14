@@ -50,6 +50,7 @@ def gitTag = getGitTag();
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 apply plugin: 'nexus'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'eclipse'
@@ -115,6 +116,16 @@ modifyPom {
 
 
 publishing {
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username nexusUsername
+                password nexusPassword
+            }
+        }
+    }
+
     publications {
             AndroidEclipsePublication(MavenPublication) {
                     from components.java
@@ -175,4 +186,8 @@ bintray {
                     attributes = ['gradle-plugin': 'android-eclipse']
             }
     }
+}
+
+signing {
+    sign publishing.publications
 }
